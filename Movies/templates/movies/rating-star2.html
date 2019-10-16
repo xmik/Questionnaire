@@ -7,6 +7,7 @@
 }
 </style>
 
+<p id="user-id">456<p>
 <h2>Star Rating</h2>
 <span class="fa fa-star" id="star1-25" onclick="add_star(this,1,25)"></span>
 <span class="fa fa-star" id="star2-25" onclick="add_star(this,2,25)"></span>
@@ -64,6 +65,8 @@
   }
 function save_ratings(ths){
   movie_ids = get_movie_ids()
+  // this gets the content of the <p> 
+  user_id = document.getElementById("user-id").innerHTML
   for (var i=0; i<movie_ids.length; i++) {
     // for each movie
     movie_id = movie_ids[i]
@@ -83,7 +86,7 @@ function save_ratings(ths){
     } else if (document.getElementById("star"+1+"-"+movie_id).className.includes("checked")) {
       rating = 1
     }
-    alert('movie id: ' + movie_ids[i] + ' rating: '+ rating);
+    alert('movie id: ' + movie_ids[i] + ' rating: '+ rating + ' user id: ' + user_id);
   }
 }
 
