@@ -34,9 +34,7 @@ movies_categories = [
 
 ]
 
-def test(request):
-    return render(request, 'movies/rating-star.html')
-def test2(request):
+def test_rating(request):
     return render(request, 'movies/rating-star2.html')
 
 # TODO: do not use it in serious websites
