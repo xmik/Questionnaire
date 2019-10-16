@@ -34,8 +34,6 @@ movies_categories = [
 
 ]
 
-def test_rating(request):
-    return render(request, 'movies/test_rating.html')
 
 # TODO: do not use it in serious websites
 # https://stackoverflow.com/questions/6506897/csrf-token-missing-or-incorrect-while-post-parameter-via-ajax-in-django#6533544
@@ -59,6 +57,11 @@ def insert_rating(request):
         return HttpResponseBadRequest('Expected method POST, got: %s' % request.method)
 
 
+def test_rating(request):
+    movies0 = Movies.objects.filter(movie_id=1)
+    movies1 = Movies.objects.filter(movie_id=25)
+    movies = [movies0[0], movies1[0]]
+    return render(request, 'movies/test_rating.html', {'movies': movies })
 def collect_ratings(request):
     # TODO: implement collecting the ratings
     # if this is a POST request we need to process the form data
