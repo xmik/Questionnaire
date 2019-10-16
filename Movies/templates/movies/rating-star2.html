@@ -17,7 +17,10 @@
 <span class="fa fa-star" id="star6-25" onclick="add_star(this,6,25)"></span>
 <span class="fa fa-close" id="notseen-25" style="float: right" onclick="add_notseen(this,25)"></span>
 <br>
-<button name="button-name" value="fav_HTML" class="btn btn-primary btn-lg active pull-right" role="button" onclick="save_ratings()">Next page</button>
+<form action="." method="post">
+  {% csrf_token %}
+  <button name="button-name" value="fav_HTML" class="btn btn-primary btn-lg active pull-right" role="button" onclick="save_ratings()">Next page</button>
+</form>
 <script>
   // https://bootsnipp.com/snippets/dlaaN
   function add_star(ths,sno,movie_id){
@@ -65,7 +68,7 @@
   }
 function save_ratings(ths){
   movie_ids = get_movie_ids()
-  // this gets the content of the <p> 
+  // this gets the content of the <p>
   user_id = document.getElementById("user-id").innerHTML
   for (var i=0; i<movie_ids.length; i++) {
     // for each movie
@@ -88,6 +91,18 @@ function save_ratings(ths){
     }
     alert('movie id: ' + movie_ids[i] + ' rating: '+ rating + ' user id: ' + user_id);
   }
+  my_post_data = {
+    name: "Donald Duck",
+    city: "Duckburg"
+  }
+  $.ajax({
+    type: "POST",
+    url: "/movies/insert_rating/",
+    data: my_post_data,
+    // make it visible on your web browser developer tools
+    success: console.log(my_post_data),
+    dataType: 'JSON'
+  });
 }
 
 </script>

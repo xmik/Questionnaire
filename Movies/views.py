@@ -5,7 +5,16 @@ from django.shortcuts import render, redirect
 from django.utils.safestring import mark_safe
 import json
 from django.contrib.auth.decorators import login_required
+from django.http import (HttpResponse, HttpResponseBadRequest,
+                         HttpResponseForbidden)
+from django.views.decorators.csrf import csrf_exempt
+from django.http import QueryDict
 
+# import the logging library
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 movies_categories = [
     {'movie_type': 'Horror', 'genres_to_be_excluded': []},
@@ -26,6 +35,22 @@ movies_categories = [
 
 def test2(request):
     return render(request, 'movies/rating-star2.html')
+# TODO: do not use it in serious websites
+# https://stackoverflow.com/questions/6506897/csrf-token-missing-or-incorrect-while-post-parameter-via-ajax-in-django#6533544
+@csrf_exempt
+def insert_rating(request):
+    logger.info('Inserting new votes')
+    if request.method == 'POST':
+        # data is of type: QUeryDict
+        data = request.POST
+        # QUeryDict to string https://stackoverflow.com/a/28621853/4457564
+        data_str = json.dumps(dict(data))
+        logger.info('Saving new vote: %s' % data_str)
+        with open('/tmp/result.txt', 'w') as file:
+            file.write(data_str)
+        return HttpResponse('Successfully inserted new votes')
+    else:
+        return HttpResponseBadRequest('Expected method POST, got: %s' % request.method)
 def collect_ratings(request):
     # TODO: implement collecting the ratings
     # if this is a POST request we need to process the form data
