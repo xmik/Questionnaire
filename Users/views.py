@@ -29,12 +29,15 @@ def get_name(request):
 
             # add new user to DB
             new_user.save()
-            
+
             # get user ID from DB
             user_from_db = Users.objects.filter(user_name=user_name_local)[0]
             request.session['user_id'] = user_from_db.user_id
+            request.session['movies_category_index'] = 0
+            request.session['movies_rated'] = 0
+            request.session['movies_rated_next'] = 0
 
-            return redirect('movies/first_movies_category')
+            return redirect('movies/rating')
         else:
             return render(request, 'users/empty_name.html')
 

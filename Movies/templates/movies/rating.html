@@ -50,7 +50,7 @@ $(document).ready(function(){
 
 <div class="row">
 	  <div class="col-sm-12">
-      <form action="{% url 'movie:collect_ratings' %}" method="post">
+      <form action="{% url 'movie:rating' %}" method="post">
         {% csrf_token %}
         <button name="button-name" value="fav_HTML" class="btn btn-primary btn-lg active pull-right" role="button" onclick="save_ratings()">Next page</button>
       </form>
