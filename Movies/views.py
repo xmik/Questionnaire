@@ -1,18 +1,16 @@
-from django.shortcuts import render
-from .models import Movies
 from django.shortcuts import render, redirect
-#from . import forms
 from django.utils.safestring import mark_safe
-import json
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseForbidden)
-from Responses.forms import VoteForm
-from django.views.decorators.csrf import csrf_exempt
-from django.http import QueryDict
-import os
-# import the logging library
+from Responses.models import Responses
+from Movies.models import Movies
+from Users.models import Users
+import json
 import logging
+import traceback
+
 
 # Get an instance of a logger
 logger = logging.getLogger('questionnaire_logger')
@@ -34,27 +32,36 @@ movies_categories = [
 
 ]
 
-
 # TODO: do not use it in serious websites
 # https://stackoverflow.com/questions/6506897/csrf-token-missing-or-incorrect-while-post-parameter-via-ajax-in-django#6533544
 @csrf_exempt
 def insert_rating(request):
     logger.info('Inserting new votes')
     if request.method == 'POST':
-        body_unicode = request.body.decode('utf-8')
-        body = json.loads(body_unicode)
+        try:
+            body_unicode = request.body.decode('utf-8')
+            body = json.loads(body_unicode)
 
-        # TODO: get from session
-        user_id = 444
-        ratings = body['ratings']
-        for rating_obj in ratings:
-            movie_rating = rating_obj['movie_rating']
-            movie_id = rating_obj['movie_id']
-            logger.info('Got new vote: user_id: ' + str(user_id) + ' movie_id: '+ str(movie_id) + ' movie_rating: ' + str(movie_rating))
-
-        return HttpResponse('Successfully inserted new votes')
+            user_id = request.session['user_id']
+            user_db_object = Users.objects.filter(user_id=user_id)[0]
+            ratings = body['ratings']
+            for rating_obj in ratings:
+                movie_rating = rating_obj['movie_rating']
+                movie_id = rating_obj['movie_id']
+                movie_db_object = Movies.objects.filter(movie_id=movie_id)[0]
+                logger.info(
+                    'Saving new vote into db: user_id: ' + str(user_id) +
+                    ' movie_id: '+ str(movie_id) +
+                    ' movie_rating: ' + str(movie_rating))
+                vote_db_object = Responses.objects.create(
+                    user_id=user_db_object, movie_id=movie_db_object, user_rate=movie_rating)
+            return HttpResponse('Successfully inserted new votes')
+        except:
+            logger.error(traceback.print_exc())
+            return HttpResponseBadRequest(traceback.print_exc())
     else:
         return HttpResponseBadRequest('Expected method POST, got: %s' % request.method)
+
 
 
 def test_rating(request):
@@ -62,25 +69,8 @@ def test_rating(request):
     movies1 = Movies.objects.filter(movie_id=25)
     movies = [movies0[0], movies1[0]]
     return render(request, 'movies/test_rating.html', {'movies': movies })
+
 def collect_ratings(request):
-    # TODO: implement collecting the ratings
-    # if this is a POST request we need to process the form data
-    #return HttpResponseBadRequest('method: %s' % request.method)
-    if request.method == 'POST':
-        # create a form instance and populate it with data from the request:
-        form = VoteForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            new_vote = form.save(commit=False)
-            return HttpResponseBadRequest('valid form: %s' % new_vote)
-            new_vote.save()
-            logger.info('Saving new vote: %s' % new_vote)
-            logger.info('Saving new vote: %s' % new_vote.user_rate)
-        else:
-            return HttpResponseBadRequest('invalid form: %s. \nRequest: %s' % (form.errors, request.body))
-
-
-
     # render new page with movies to be rated
     request.session['movies_category_index'] = int(request.session.get('movies_category_index',0)) + 1
     if int(request.session['movies_category_index']) == len(movies_categories):
