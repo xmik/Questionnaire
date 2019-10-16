@@ -52,24 +52,24 @@
       document.getElementById("star"+6+"-"+movie_id).className="fa fa-star"
     }
   }
-  // parses current document and gets an array of
-  // currently rendered movies ids
-  // (returns array of integers)
-  function get_movie_ids(ths) {
-    var movie_notseen_elements = $('*[id^="notseen-"]');
-    var movie_ids = new Array();
-    for (var i=0; i<movie_notseen_elements.length; i++) {
-      // e.g. notseen-25
-      var css_identifier = movie_notseen_elements[i].id
-      var movie_id = css_identifier.split('-')[1]
-      movie_ids.push(movie_id)
-    }
-    return movie_ids
+// parses current document and gets an array of
+// currently rendered movies ids
+// (returns array of integers)
+function get_movie_ids(ths) {
+  var movie_notseen_elements = $('*[id^="notseen-"]');
+  var movie_ids = new Array();
+  for (var i=0; i<movie_notseen_elements.length; i++) {
+    // e.g. notseen-25
+    var css_identifier = movie_notseen_elements[i].id
+    var movie_id = css_identifier.split('-')[1]
+    movie_ids.push(movie_id)
   }
-function save_ratings(ths){
-  movie_ids = get_movie_ids()
-  // this gets the content of the <p>
-  user_id = document.getElementById("user-id").innerHTML
+  return movie_ids
+}
+// parses current document and gets an array of
+// dictionaries of movie_id + rating
+function get_movies_ratings(ths, movie_ids) {
+  var ratings = new Array();
   for (var i=0; i<movie_ids.length; i++) {
     // for each movie
     movie_id = movie_ids[i]
@@ -89,21 +89,32 @@ function save_ratings(ths){
     } else if (document.getElementById("star"+1+"-"+movie_id).className.includes("checked")) {
       rating = 1
     }
+    ratings.push({
+      movie_id: movie_id,
+      movie_rating: rating
+    })
     alert('movie id: ' + movie_ids[i] + ' rating: '+ rating + ' user id: ' + user_id);
+    return ratings
   }
+}
+function save_ratings(ths){
+  // innerHTML this gets the content of the <p>
+  user_id = document.getElementById("user-id").innerHTML
+  movie_ids = get_movie_ids()
+  ratings = get_movies_ratings(ths, movie_ids)
   my_post_data = {
-    name: "Donald Duck",
-    city: "Duckburg"
+    user_id: user_id,
+    ratings: ratings
   }
+  my_post_data_str = JSON.stringify(my_post_data)
   $.ajax({
     type: "POST",
     url: "/movies/insert_rating/",
-    data: my_post_data,
+    data: my_post_data_str,
     // make it visible on your web browser developer tools
-    success: console.log(my_post_data),
+    success: console.log(my_post_data_str),
     dataType: 'JSON'
   });
 }
-
 </script>
 {% endblock %}
