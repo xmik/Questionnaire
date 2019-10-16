@@ -32,15 +32,15 @@ function add_notseen(ths,movie_id){
 // currently rendered movies ids
 // (returns array of integers)
 function get_movie_ids(ths) {
-var movie_notseen_elements = $('*[id^="notseen-"]');
-var movie_ids = new Array();
-for (var i=0; i<movie_notseen_elements.length; i++) {
-  // e.g. notseen-25
-  var css_identifier = movie_notseen_elements[i].id
-  var movie_id = css_identifier.split('-')[1]
-  movie_ids.push(movie_id)
-}
-return movie_ids
+  var movie_notseen_elements = $('*[id^="notseen-"]');
+  var movie_ids = new Array();
+  for (var i=0; i<movie_notseen_elements.length; i++) {
+    // e.g. notseen-25
+    var css_identifier = movie_notseen_elements[i].id
+    var movie_id = css_identifier.split('-')[1]
+    movie_ids.push(movie_id)
+  }
+  return movie_ids
 }
 // parses current document and gets an array of
 // dictionaries of movie_id + rating
@@ -70,14 +70,20 @@ function get_movies_ratings(ths, movie_ids, alert_each_rating) {
       movie_rating: rating
     })
     if (alert_each_rating == true) {
-      alert('movie_id: ' + movie_id + ' movie_rating: ' movie_rating)
+      alert('movie id: ' + movie_id + ' rating: '+ rating);
     }
   }
   return ratings
 }
-function save_ratings(ths){
+// used in test view only, does not send any data
+function print_rate(ths){
   movie_ids = get_movie_ids()
   ratings = get_movies_ratings(ths, movie_ids, true)
+}
+// used in production view, sends data with POST method
+function save_ratings(ths){
+  movie_ids = get_movie_ids()
+  ratings = get_movies_ratings(ths, movie_ids, false)
   my_post_data = {
     ratings: ratings
   }

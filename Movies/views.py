@@ -35,7 +35,7 @@ movies_categories = [
 ]
 
 def test_rating(request):
-    return render(request, 'movies/rating-star2.html')
+    return render(request, 'movies/test_rating.html')
 
 # TODO: do not use it in serious websites
 # https://stackoverflow.com/questions/6506897/csrf-token-missing-or-incorrect-while-post-parameter-via-ajax-in-django#6533544
